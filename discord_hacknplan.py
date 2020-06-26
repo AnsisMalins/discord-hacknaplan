@@ -3,7 +3,7 @@ import discord
 import re
 import requests
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(fromfile_prefix_chars="@")
 parser.add_argument("--discord-token", required=True, help="The bot token from your Discord developer dashboard")
 parser.add_argument("--hacknplan-api-key", required=True, help="The Hacknplan API key from your account settings")
 parser.add_argument("--hacknplan-project-id", required=True, help="The ID of the Hacknplan project you're in")
@@ -23,7 +23,7 @@ async def on_message(message):
     match = re.search(r"(?:^|\s)#(\d+)(?:$|\s)", message.content)
     if match == None:
         return
-    workItemId = match[1]
+    workItemId = match.group(1)
 
     response = requests.get("https://api.hacknplan.com/v0/projects/" + args.hacknplan_project_id
             + "/workitems/" + workItemId, headers = { "Authorization": "ApiKey " + args.hacknplan_api_key })
