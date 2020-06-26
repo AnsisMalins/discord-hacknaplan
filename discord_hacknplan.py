@@ -9,6 +9,9 @@ parser.add_argument("--hacknplan-api-key", required=True, help="The Hacknplan AP
 parser.add_argument("--hacknplan-project-id", required=True, help="The ID of the Hacknplan project you're in")
 args = parser.parse_args()
 
+lastMatches = { }
+linesSeen = { }
+
 client = discord.Client(fetch_offline_members=False, max_messages=None, guild_subscriptions=False)
 
 @client.event
@@ -17,6 +20,10 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    present = linesSeen.get(message.channel.id, 0)
+    present += len(message.content) / 80 + 1;
+    linesSeen[message.channel.id] = present
+
     if message.type != discord.MessageType.default or message.author.bot or message.author.system:
         return
 
@@ -24,6 +31,14 @@ async def on_message(message):
     if match == None:
         return
     workItemId = match.group(1)
+
+    # Avoid responding to a mention if we did it recently already
+    lastMatch = lastMatches.get((message.channel.id, workItemId))
+    if lastMatch != None and present - lastMatch < 10:
+        return
+    lastMatches[(message.channel.id, workItemId)] = present
+
+    # TODO: remove old entries from lastMatches
 
     response = requests.get("https://api.hacknplan.com/v0/projects/" + args.hacknplan_project_id
             + "/workitems/" + workItemId, headers = { "Authorization": "ApiKey " + args.hacknplan_api_key })
