@@ -1,11 +1,24 @@
-# discord-hacknaplan
+# discord-hacknplan
 A Discord bot that responds to mentions of Hacknplan tasks with embeds thereof
 
-To load and run the pyproj, you need to create a file called CommandLineArguments.props and fill it with your secrets.
-```XML
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <PropertyGroup>
-        <CommandLineArguments>--discord-token 0 --hacknplan-api-key 0 --hacknplan-project-id 0</CommandLineArguments>
-    </PropertyGroup>
-</Project>
+To load and run the pyproj, you need to create a file called secrets.txt and fill it with your secrets.
+```
+--discord-token
+asdfgh
+--hacknplan-api-key
+asdfgh
+--hacknplan-project-id
+1234
+```
+To install the bot in production, clone the repository and create a systemd unit file like this one.
+```Ini
+[Unit]
+Description=https://github.com/AnsisMalins/discord-hacknplan
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /root/discord-hacknplan/discord_hacknplan.py --discord-token asdfgh --hacknplan-api-key asdfgh --hacknplan-project-id 1234
+
+[Install]
+WantedBy=default.target
 ```
